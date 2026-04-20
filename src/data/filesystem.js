@@ -1,16 +1,27 @@
+import { videoUrl } from "../config/media";
+
 const VIDEO_SAMPLES = {
-  sparkboxLoop1: "/media/video/Spx-1-ez.mp4",
-  sparkboxLoop2: "/media/video/Spx-2-ez.mp4",
-  sparkboxLoop3: "/media/video/Spx-3-ez.mp4",
-  sparkboxLoop4: "/media/video/Spx-4-ez.mp4",
-  sparkboxLoop5: "/media/video/Spx-5-ez.mp4",
-  sparkboxLoop6: "/media/video/Spx-6-ez.mp4",
-  sparkboxLoop7: "/media/video/Spx-7-ez.mp4",
-  sparkboxLoop8: "/media/video/Spx-8-ez.mp4",
-  upstairsTrio: "/media/imports/unknown-album/Unknown Album/Upstaris@trio.mp4",
-  sunset: "/media/imports/unknown-album/Unknown Album/SunSet2021(4x5).mp4",
+  sparkboxLoop1: videoUrl("/Spx-1-ez.mp4", "/media/video/Spx-1-ez.mp4"),
+  sparkboxLoop2: videoUrl("/Spx-2-ez.mp4", "/media/video/Spx-2-ez.mp4"),
+  sparkboxLoop3: videoUrl("/Spx-3-ez.mp4", "/media/video/Spx-3-ez.mp4"),
+  sparkboxLoop4: videoUrl("/Spx-4-ez.mp4", "/media/video/Spx-4-ez.mp4"),
+  sparkboxLoop5: videoUrl("/Spx-5-ez.mp4", "/media/video/Spx-5-ez.mp4"),
+  sparkboxLoop6: videoUrl("/Spx-6-ez.mp4", "/media/video/Spx-6-ez.mp4"),
+  sparkboxLoop7: videoUrl("/Spx-7-ez.mp4", "/media/video/Spx-7-ez.mp4"),
+  sparkboxLoop8: videoUrl("/Spx-8-ez.mp4", "/media/video/Spx-8-ez.mp4"),
+  upstairsTrio: videoUrl(
+    "/Upstaris@trio.mp4",
+    "/media/imports/unknown-album/Unknown Album/Upstaris@trio.mp4",
+  ),
+  sunset: videoUrl(
+    "/SunSet2021(4x5).mp4",
+    "/media/imports/unknown-album/Unknown Album/SunSet2021(4x5).mp4",
+  ),
   trioPromo:
-    "/media/imports/unknown-album/Unknown Album/TRIO5.15.21Promo4x5.mp4",
+    videoUrl(
+      "/TRIO5.15.21Promo4x5.mp4",
+      "/media/imports/unknown-album/Unknown Album/TRIO5.15.21Promo4x5.mp4",
+    ),
 };
 
 export const PASSWORD = "sparkbox";
@@ -129,25 +140,25 @@ export const FILES = {
   "full-hustle": videoFile(
     "full-hustle",
     "hustle.mp4",
-    "/media/video/full-hustle.mp4",
+    videoUrl("/full-hustle.mp4", "/media/video/full-hustle.mp4"),
     "Long-form Sparkbox visual with full audio.",
   ),
   "full-newlvl": videoFile(
     "full-newlvl",
     "new-lvl.mp4",
-    "/media/video/full-newlvl.mp4",
+    videoUrl("/full-newlvl.mp4", "/media/video/full-newlvl.mp4"),
     "Long-form Sparkbox visual with full audio.",
   ),
   "full-rake": videoFile(
     "full-rake",
     "rake.mp4",
-    "/media/video/full-rake.mp4",
+    videoUrl("/full-rake.mp4", "/media/video/full-rake.mp4"),
     "Long-form Sparkbox visual with full audio.",
   ),
   "full-throw-some-ds": videoFile(
     "full-throw-some-ds",
     "throw-some-d's.mp4",
-    "/media/video/full-throw-some-d's.mp4",
+    videoUrl("/full-throw-some-d's.mp4", "/media/video/full-throw-some-d's.mp4"),
     "Long-form Sparkbox visual with full audio.",
   ),
   "march-on-mars": audioFile(

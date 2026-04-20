@@ -280,20 +280,12 @@ export default function App() {
     if (!audio || !track?.src) return;
 
     try {
-      const isSameTrack =
-        currentTrackId === trackId && audio.dataset.trackId === trackId;
-
       playbackTransitionRef.current = true;
       audio.pause();
       audio.currentTime = 0;
       audio.muted = false;
       audio.preload = "auto";
-
-      if (!isSameTrack) {
-        syncAudioSource(trackId, audio);
-      }
-
-      audio.currentTime = 0;
+      forceAudioSource(trackId, audio);
 
       setCurrentTrackId(trackId);
       setIsPlaying(true);
@@ -301,7 +293,7 @@ export default function App() {
       setPlaybackPosition(0);
 
       await ensureAudioAnalysis();
-      await audio.play();
+      await playAudioElement(audio);
       playbackTransitionRef.current = false;
     } catch {
       playbackTransitionRef.current = false;
@@ -318,11 +310,10 @@ export default function App() {
       playbackTransitionRef.current = true;
       setCurrentTrackId(trackId);
       setPlaybackError("");
-      syncAudioSource(trackId, audio);
-      audio.currentTime = 0;
+      forceAudioSource(trackId, audio);
       setPlaybackPosition(0);
       await ensureAudioAnalysis();
-      await audio.play();
+      await playAudioElement(audio);
       setIsPlaying(true);
       playbackTransitionRef.current = false;
     } catch {
@@ -350,7 +341,7 @@ export default function App() {
       playbackTransitionRef.current = true;
       setPlaybackError("");
       await ensureAudioAnalysis();
-      await audio.play();
+      await playAudioElement(audio);
       setIsPlaying(true);
       playbackTransitionRef.current = false;
     } catch {
@@ -587,3 +578,22 @@ export default function App() {
   );
 }
 // ily :)
+
+function forceAudioSource(trackId, audio) {
+  const track = FILES[trackId];
+  if (!track?.src) return;
+
+  audio.src = track.src;
+  audio.dataset.trackId = trackId;
+  audio.load();
+  audio.currentTime = 0;
+}
+
+async function playAudioElement(audio) {
+  try {
+    await audio.play();
+  } catch {
+    audio.load();
+    await audio.play();
+  }
+}

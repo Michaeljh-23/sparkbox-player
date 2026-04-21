@@ -456,6 +456,13 @@ export default function App() {
     setIsPlaying(false);
   };
 
+  const unloadPlayback = () => {
+    stopPlayback();
+    setCurrentTrackId(null);
+    setPlaybackError("");
+    setPlaybackDebug("");
+  };
+
   const resumePlayback = async () => {
     const audio = audioRef.current;
     if (!audio || !currentTrackId) return;
@@ -627,7 +634,7 @@ export default function App() {
       togglePlayback();
     }
     if (actionId === "stop") {
-      stopPlayback();
+      unloadPlayback();
     }
     if (actionId === "fullscreen") {
       await toggleFullscreen();

@@ -8,15 +8,15 @@ export default function BackgroundVisualizer({
 }) {
   const [videoFailed, setVideoFailed] = useState(false);
   const videoRef = useRef(null);
+  const hasTrackVideo = Boolean(currentTrack?.backgroundVideo);
   const theme = currentTrack?.visualTheme ?? {
     accent: "#f6ddb0",
     glow: "rgba(246, 221, 176, 0.28)",
     hue: 24,
   };
-  const videoSrc =
-    isPlaying && currentTrack?.backgroundVideo
-      ? currentTrack.backgroundVideo
-      : FALLBACK_BACKGROUND_VIDEO;
+  const videoSrc = hasTrackVideo
+    ? currentTrack.backgroundVideo
+    : FALLBACK_BACKGROUND_VIDEO;
 
   useEffect(() => {
     setVideoFailed(false);
@@ -59,7 +59,7 @@ export default function BackgroundVisualizer({
       <div className="visualizer-orb visualizer-orb-a" />
       <div className="visualizer-orb visualizer-orb-b" />
       <div
-        className={`visualizer-video-frame ${isPlaying && currentTrack ? "has-track-video" : ""}`}
+        className={`visualizer-video-frame ${hasTrackVideo ? "has-track-video" : ""}`}
       >
         <div className="visualizer-overlay">
           <p className="visualizer-kicker">

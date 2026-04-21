@@ -1,4 +1,6 @@
+import { useEffect, useRef } from "react";
 import FolderView from "./FolderView";
+import PongPanel from "./PongPanel";
 
 export default function FileView({
   file,
@@ -9,6 +11,7 @@ export default function FileView({
   currentTrackId,
   isPlaying,
   barLevels,
+  volume,
 }) {
   if (file.type === "folder") {
     return (
@@ -42,20 +45,7 @@ export default function FileView({
   }
 
   if (file.type === "video") {
-    return (
-      <div className="video-panel">
-        <div className="video-stage">
-          <video
-            className="video-stage-asset"
-            src={file.src}
-            controls
-            autoPlay
-            playsInline
-          />
-        </div>
-        <p>{file.caption}</p>
-      </div>
-    );
+    return <VideoPanel file={file} volume={volume} />;
   }
 
   if (file.type === "audio") {
@@ -87,7 +77,41 @@ export default function FileView({
     );
   }
 
+  if (file.type === "game") {
+    return <PongPanel />;
+  }
+
   return null;
+}
+
+function VideoPanel({ file, volume = 0.9 }) {
+  const videoRef = useRef(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    video.volume = volume;
+  }, [volume]);
+
+  return (
+    <div className="video-panel">
+      <div className="video-stage">
+        <video
+          ref={videoRef}
+          className="video-stage-asset"
+          src={file.src}
+          controls
+          controlsList="nodownload noplaybackrate noremoteplayback"
+          autoPlay
+          playsInline
+          disablePictureInPicture
+          disableRemotePlayback
+          onContextMenu={(event) => event.preventDefault()}
+        />
+      </div>
+      <p>{file.caption}</p>
+    </div>
+  );
 }
 
 function AboutCard({ file }) {

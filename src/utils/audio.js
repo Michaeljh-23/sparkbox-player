@@ -6,6 +6,12 @@ export function syncAudioSource(trackId, audio) {
 
   if (audio.dataset.trackId === trackId) return;
 
+  if (/^https?:\/\//i.test(track.src)) {
+    audio.crossOrigin = "anonymous";
+  } else {
+    audio.removeAttribute("crossorigin");
+  }
+
   audio.src = track.src;
   audio.dataset.trackId = trackId;
   audio.load();

@@ -8,6 +8,13 @@ import { toggleFullscreen } from "./utils/fullscreen";
 import { formatClock } from "./utils/formatting";
 import { createWindow, ROOT_WINDOW_FILE_ID } from "./utils/windowing";
 
+const DESKTOP_ICON_BOUNDS = {
+  left: 8,
+  top: 72,
+  rightPadding: 108,
+  bottomPadding: 148,
+};
+
 export default function App() {
   const [phase, setPhase] = useState("boot");
   const [password, setPassword] = useState("");
@@ -15,6 +22,20 @@ export default function App() {
   const [battery, setBattery] = useState(87);
   const [clock, setClock] = useState(() => formatClock());
   const [selectedDesktopId, setSelectedDesktopId] = useState(null);
+  const [showHiddenFiles, setShowHiddenFiles] = useState(false);
+  const [isMobileLike, setIsMobileLike] = useState(() =>
+    typeof window !== "undefined" &&
+    window.matchMedia?.("(pointer: coarse)").matches,
+  );
+  const [desktopPositions, setDesktopPositions] = useState(() =>
+    DESKTOP_LAYOUT.reduce((positions, entry) => {
+      positions[entry.id] = {
+        x: 24 + entry.x * 130,
+        y: DESKTOP_ICON_BOUNDS.top + entry.y * 132,
+      };
+      return positions;
+    }, {}),
+  );
   const [mainViewId, setMainViewId] = useState(null);
   const [mainViewWindow, setMainViewWindow] = useState({
     minimized: false,
@@ -26,8 +47,10 @@ export default function App() {
   const [currentTrackId, setCurrentTrackId] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [playbackError, setPlaybackError] = useState("");
+  const [playbackDebug, setPlaybackDebug] = useState("");
   const [playbackPosition, setPlaybackPosition] = useState(0);
   const [trackDuration, setTrackDuration] = useState(0);
+  const [volume, setVolume] = useState(0.9);
   const [barLevels, setBarLevels] = useState(() =>
     Array.from({ length: 36 }, () => 0.14),
   );
@@ -57,6 +80,28 @@ export default function App() {
     const timer = window.setInterval(() => setClock(formatClock()), 1000);
     return () => window.clearInterval(timer);
   }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.matchMedia) return undefined;
+
+    const mediaQuery = window.matchMedia("(pointer: coarse)");
+    const handleChange = (event) => {
+      setIsMobileLike(event.matches);
+    };
+
+    setIsMobileLike(mediaQuery.matches);
+    mediaQuery.addEventListener?.("change", handleChange);
+
+    return () => {
+      mediaQuery.removeEventListener?.("change", handleChange);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (isMobileLike) {
+      setShowHiddenFiles(false);
+    }
+  }, [isMobileLike]);
 
   useEffect(() => {
     const handleWindowClick = () => setActiveMenuId(null);
@@ -102,6 +147,12 @@ export default function App() {
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
+    audio.volume = volume;
+  }, [volume]);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
 
     if (!currentTrackId) {
       audio.pause();
@@ -121,14 +172,24 @@ export default function App() {
     if (!audio || !currentTrackId) return;
 
     if (isPlaying) {
-      ensureAudioAnalysis().then(() => {
-        audio.play().catch(() => {
+      const playCurrentTrack = async () => {
+        try {
+          try {
+            await ensureAudioAnalysis();
+          } catch {
+            // Keep playback alive even if Web Audio analysis cannot attach.
+          }
+
+          await audio.play();
+        } catch {
           setIsPlaying(false);
           setPlaybackError(
             "Playback was blocked or the file could not be loaded.",
           );
-        });
-      });
+        }
+      };
+
+      playCurrentTrack();
       return;
     }
 
@@ -149,7 +210,6 @@ export default function App() {
         await ensureAudioAnalysis();
       } catch {
         // Ignore analysis setup failures so playback can continue.
-        //ugh
       }
       setIsPlaying(true);
     };
@@ -159,6 +219,33 @@ export default function App() {
     const handleDurationChange = () => {
       setTrackDuration(Number.isFinite(audio.duration) ? audio.duration : 0);
     };
+    const handleLoadStart = () => {
+      setPlaybackDebug(
+        `loadstart | readyState=${audio.readyState} | networkState=${audio.networkState}`,
+      );
+    };
+    const handleCanPlay = () => {
+      setPlaybackDebug(
+        `canplay | readyState=${audio.readyState} | duration=${Number.isFinite(audio.duration) ? audio.duration.toFixed(2) : "?"}`,
+      );
+    };
+    const handleWaiting = () => {
+      setPlaybackDebug(
+        `waiting | readyState=${audio.readyState} | networkState=${audio.networkState}`,
+      );
+    };
+    const handleStalled = () => {
+      setPlaybackDebug(
+        `stalled | readyState=${audio.readyState} | networkState=${audio.networkState}`,
+      );
+    };
+    const handleError = () => {
+      const code = audio.error?.code ?? "unknown";
+      setPlaybackError(`Audio element error code ${code}.`);
+      setPlaybackDebug(
+        `error | code=${code} | readyState=${audio.readyState} | networkState=${audio.networkState} | src=${audio.currentSrc}`,
+      );
+    };
 
     audio.addEventListener("ended", handleEnded);
     audio.addEventListener("pause", handlePause);
@@ -166,6 +253,11 @@ export default function App() {
     audio.addEventListener("timeupdate", handleTimeUpdate);
     audio.addEventListener("loadedmetadata", handleDurationChange);
     audio.addEventListener("durationchange", handleDurationChange);
+    audio.addEventListener("loadstart", handleLoadStart);
+    audio.addEventListener("canplay", handleCanPlay);
+    audio.addEventListener("waiting", handleWaiting);
+    audio.addEventListener("stalled", handleStalled);
+    audio.addEventListener("error", handleError);
 
     return () => {
       audio.removeEventListener("ended", handleEnded);
@@ -174,6 +266,11 @@ export default function App() {
       audio.removeEventListener("timeupdate", handleTimeUpdate);
       audio.removeEventListener("loadedmetadata", handleDurationChange);
       audio.removeEventListener("durationchange", handleDurationChange);
+      audio.removeEventListener("loadstart", handleLoadStart);
+      audio.removeEventListener("canplay", handleCanPlay);
+      audio.removeEventListener("waiting", handleWaiting);
+      audio.removeEventListener("stalled", handleStalled);
+      audio.removeEventListener("error", handleError);
     };
   }, []);
 
@@ -241,13 +338,39 @@ export default function App() {
     }
   };
 
+  const teardownAudioAnalysis = async () => {
+    try {
+      sourceNodeRef.current?.disconnect();
+    } catch {}
+
+    try {
+      analyserRef.current?.disconnect();
+    } catch {}
+
+    try {
+      if (audioContextRef.current && audioContextRef.current.state !== "closed") {
+        await audioContextRef.current.close();
+      }
+    } catch {}
+
+    audioContextRef.current = null;
+    analyserRef.current = null;
+    sourceNodeRef.current = null;
+  };
+
   const visibleDesktopItems = useMemo(
     () =>
-      DESKTOP_LAYOUT.map((entry) => ({
+      DESKTOP_LAYOUT.filter(
+        (entry) => (!entry.hidden || (showHiddenFiles && !isMobileLike)),
+      ).map((entry) => ({
         ...entry,
         file: FILES[entry.id],
+        position: desktopPositions[entry.id] ?? {
+          x: 24 + entry.x * 130,
+          y: DESKTOP_ICON_BOUNDS.top + entry.y * 132,
+        },
       })),
-    [],
+    [desktopPositions, isMobileLike, showHiddenFiles],
   );
 
   const handleLogin = () => {
@@ -290,9 +413,9 @@ export default function App() {
       setCurrentTrackId(trackId);
       setIsPlaying(true);
       setPlaybackError("");
+      setPlaybackDebug(`playTrack | src=${track.src}`);
       setPlaybackPosition(0);
 
-      await ensureAudioAnalysis();
       await playAudioElement(audio);
       playbackTransitionRef.current = false;
     } catch {
@@ -310,9 +433,9 @@ export default function App() {
       playbackTransitionRef.current = true;
       setCurrentTrackId(trackId);
       setPlaybackError("");
+      setPlaybackDebug(`restartTrack | src=${FILES[trackId]?.src ?? ""}`);
       forceAudioSource(trackId, audio);
       setPlaybackPosition(0);
-      await ensureAudioAnalysis();
       await playAudioElement(audio);
       setIsPlaying(true);
       playbackTransitionRef.current = false;
@@ -340,7 +463,7 @@ export default function App() {
     try {
       playbackTransitionRef.current = true;
       setPlaybackError("");
-      await ensureAudioAnalysis();
+      setPlaybackDebug(`resumePlayback | src=${audio.currentSrc || audio.src}`);
       await playAudioElement(audio);
       setIsPlaying(true);
       playbackTransitionRef.current = false;
@@ -354,6 +477,8 @@ export default function App() {
   const openFile = (fileId) => {
     const file = FILES[fileId];
     if (!file) return;
+
+    setSelectedDesktopId(null);
 
     if (file.type === "folder") {
       setMainViewId(fileId);
@@ -489,9 +614,8 @@ export default function App() {
   };
 
   const handleMenuAction = async (actionId) => {
-    if (actionId === "open-root") {
-      setMainViewId(ROOT_WINDOW_FILE_ID);
-      setMainViewWindow((current) => ({ ...current, minimized: false }));
+    if (actionId === "toggle-hidden" && !isMobileLike) {
+      setShowHiddenFiles((current) => !current);
     }
     if (actionId === "open-selected" && selectedDesktopId) {
       openFile(selectedDesktopId);
@@ -519,9 +643,33 @@ export default function App() {
     setPlaybackPosition(nextTime);
   };
 
+  const moveDesktopItem = (fileId, position) => {
+    const maxX = Math.max(
+      DESKTOP_ICON_BOUNDS.left,
+      window.innerWidth - DESKTOP_ICON_BOUNDS.rightPadding,
+    );
+    const maxY = Math.max(
+      DESKTOP_ICON_BOUNDS.top,
+      window.innerHeight - DESKTOP_ICON_BOUNDS.bottomPadding,
+    );
+
+    setDesktopPositions((current) => ({
+      ...current,
+      [fileId]: {
+        x: Math.min(maxX, Math.max(DESKTOP_ICON_BOUNDS.left, position.x)),
+        y: Math.min(maxY, Math.max(DESKTOP_ICON_BOUNDS.top, position.y)),
+      },
+    }));
+  };
+
   return (
     <>
-      <audio ref={audioRef} preload="auto" className="global-audio-player" />
+      <audio
+        ref={audioRef}
+        preload="auto"
+        crossOrigin="anonymous"
+        className="global-audio-player"
+      />
       <div className="app-shell">
         {phase === "boot" && <BootScreen />}
         {phase === "login" && (
@@ -537,12 +685,14 @@ export default function App() {
             activeMenuId={activeMenuId}
             clock={clock}
             currentTrack={currentTrack}
+            allowHiddenFiles={!isMobileLike}
+            showHiddenFiles={showHiddenFiles}
+            volume={volume}
             isPlaying={isPlaying}
             barLevels={barLevels}
             mainView={FILES[mainViewId]}
             mainViewWindow={mainViewWindow}
             openWindows={openWindows}
-            playbackError={playbackError}
             playbackPosition={playbackPosition}
             selectedDesktopId={selectedDesktopId}
             trackDuration={trackDuration}
@@ -560,8 +710,10 @@ export default function App() {
             onMoveMainView={(position) =>
               setMainViewWindow((current) => ({ ...current, ...position }))
             }
+            onMoveDesktopItem={moveDesktopItem}
             onSelectDesktop={setSelectedDesktopId}
             onSeek={handleSeek}
+            onVolumeChange={setVolume}
             onTogglePlayback={togglePlayback}
             onToggleMainView={() =>
               setMainViewWindow((current) => ({
@@ -583,6 +735,12 @@ function forceAudioSource(trackId, audio) {
   const track = FILES[trackId];
   if (!track?.src) return;
 
+  if (isRemoteMedia(track.src)) {
+    audio.crossOrigin = "anonymous";
+  } else {
+    audio.removeAttribute("crossorigin");
+  }
+
   audio.src = track.src;
   audio.dataset.trackId = trackId;
   audio.load();
@@ -596,4 +754,8 @@ async function playAudioElement(audio) {
     audio.load();
     await audio.play();
   }
+}
+
+function isRemoteMedia(src) {
+  return typeof src === "string" && /^https?:\/\//i.test(src);
 }

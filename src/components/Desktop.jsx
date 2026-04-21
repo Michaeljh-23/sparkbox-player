@@ -8,14 +8,16 @@ import WindowFrame from "./WindowFrame";
 
 export default function Desktop({
   activeMenuId,
+  allowHiddenFiles,
   clock,
   currentTrack,
+  showHiddenFiles,
+  volume,
   isPlaying,
   barLevels,
   mainView,
   mainViewWindow,
   openWindows,
-  playbackError,
   playbackPosition,
   selectedDesktopId,
   trackDuration,
@@ -29,8 +31,10 @@ export default function Desktop({
   onCloseMainView,
   onMinimizeMainView,
   onMoveMainView,
+  onMoveDesktopItem,
   onSelectDesktop,
   onSeek,
+  onVolumeChange,
   onTogglePlayback,
   onToggleMainView,
   onToggleWindow,
@@ -45,8 +49,12 @@ export default function Desktop({
     >
       <MenuBar
         activeMenuId={activeMenuId}
+        allowHiddenFiles={allowHiddenFiles}
         clock={clock}
         currentTrack={currentTrack}
+        showHiddenFiles={showHiddenFiles}
+        volume={volume}
+        onVolumeChange={onVolumeChange}
         onActivateMenu={onActivateMenu}
         onMenuAction={onMenuAction}
       />
@@ -61,6 +69,7 @@ export default function Desktop({
         <MainHostPanel
           mainView={mainView}
           position={mainViewWindow}
+          volume={volume}
           onClose={onCloseMainView}
           onMinimize={onMinimizeMainView}
           onMove={onMoveMainView}
@@ -69,12 +78,17 @@ export default function Desktop({
       ) : null}
 
       <div className="desktop-icons">
-        {visibleDesktopItems.map(({ id, file, x, y }) => (
+        {visibleDesktopItems.map(({ id, file, position }) => (
           <DesktopIcon
             key={id}
+            fileId={id}
             file={file}
             isSelected={selectedDesktopId === id}
-            style={{ gridColumn: x + 1, gridRow: y + 1 }}
+            style={{
+              left: `${position.x}px`,
+              top: `${position.y}px`,
+            }}
+            onMove={(nextPosition) => onMoveDesktopItem(id, nextPosition)}
             onOpen={() => onOpenFile(id)}
             onSelect={() => onSelectDesktop(id)}
           />
@@ -98,6 +112,7 @@ export default function Desktop({
               currentTrackId={currentTrack?.id ?? null}
               isPlaying={isPlaying}
               barLevels={barLevels}
+              volume={volume}
               onUpdateWindow={(updates) =>
                 onUpdateWindow(windowItem.windowId, updates)
               }
@@ -112,7 +127,6 @@ export default function Desktop({
         mainView={mainView}
         mainViewMinimized={mainViewWindow.minimized}
         openWindows={openWindows}
-        playbackError={playbackError}
         playbackPosition={playbackPosition}
         trackDuration={trackDuration}
         onSeek={onSeek}

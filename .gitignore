@@ -23,3 +23,4 @@ dist-ssr
 *.sln
 *.sw?
 public/media/video/
+public/media/tracks/

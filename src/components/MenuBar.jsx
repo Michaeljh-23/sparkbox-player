@@ -2,8 +2,12 @@ import { MENU_CONFIG } from "../constants/ui";
 
 export default function MenuBar({
   activeMenuId,
+  allowHiddenFiles,
   clock,
   currentTrack,
+  showHiddenFiles,
+  volume,
+  onVolumeChange,
   onActivateMenu,
   onMenuAction,
 }) {
@@ -29,14 +33,22 @@ export default function MenuBar({
             </button>
             {activeMenuId === menu.id && (
               <div className="menu-dropdown">
-                {menu.items.map((item) => (
+                {menu.items
+                  .filter(
+                    (item) => item.id !== "toggle-hidden" || allowHiddenFiles,
+                  )
+                  .map((item) => (
                   <button
                     key={item.id}
                     className="menu-dropdown-item"
                     type="button"
                     onClick={() => onMenuAction(item.id)}
                   >
-                    {item.label}
+                    {item.id === "toggle-hidden"
+                      ? showHiddenFiles
+                        ? "Hide hidden files"
+                        : "Show hidden files"
+                      : item.label}
                   </button>
                 ))}
               </div>
@@ -48,7 +60,21 @@ export default function MenuBar({
         <img src="/media/logos/spx-logo-white.png" alt="" />
       </div>
       <div className="status-group">
-        <span>{currentTrack ? currentTrack.name : "No file playing"}</span>
+        <span>{currentTrack ? currentTrack.name : ""}</span>
+        <div className="nav-volume">
+          <span className="nav-volume-label">Vol</span>
+          <input
+            className="nav-volume-slider"
+            type="range"
+            min="0"
+            max="1"
+            step="0.01"
+            value={volume}
+            onChange={(event) => onVolumeChange(Number(event.target.value))}
+            style={{ "--progress": `${volume * 100}%` }}
+            aria-label="Volume"
+          />
+        </div>
         <span>{clock}</span>
       </div>
     </header>

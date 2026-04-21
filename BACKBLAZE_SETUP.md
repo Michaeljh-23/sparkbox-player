@@ -1,22 +1,26 @@
-# Backblaze Video Setup
+# Backblaze Media Setup
 
-This project is prepared to pull only videos from Backblaze.
+This project is prepared to pull videos and tracks from Backblaze.
 
-Use a public Backblaze bucket or CDN URL and set:
+Use public Backblaze bucket/CDN URLs and set:
 
 `VITE_VIDEO_BASE_URL`
+`VITE_TRACK_BASE_URL`
 
 Example local `.env`:
 
 ```env
-VITE_VIDEO_BASE_URL=https://f005.backblazeb2.com/file/your-public-video-bucket
+VITE_VIDEO_BASE_URL=https://f005.backblazeb2.com/file/sparkbox-media/videos
+VITE_TRACK_BASE_URL=https://f005.backblazeb2.com/file/sparkbox-media/tracks
 ```
 
 How it works:
 
 - MP4/video paths use `VITE_VIDEO_BASE_URL`
-- audio, images, and logos still load locally
+- audio track paths use `VITE_TRACK_BASE_URL`
+- images and logos still load locally
 - if `VITE_VIDEO_BASE_URL` is blank, videos still load from local `/media/video/...`
+- if `VITE_TRACK_BASE_URL` is blank, tracks are expected at root-relative remote paths like `/ignite.mp3`
 
 Important:
 

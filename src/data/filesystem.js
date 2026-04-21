@@ -1,14 +1,14 @@
-import { videoUrl } from "../config/media";
+import { trackAsset, videoAsset, videoUrl } from "../config/media";
 
 const VIDEO_SAMPLES = {
-  sparkboxLoop1: videoUrl("/Spx-1-ez.mp4", "/media/video/Spx-1-ez.mp4"),
-  sparkboxLoop2: videoUrl("/Spx-2-ez.mp4", "/media/video/Spx-2-ez.mp4"),
-  sparkboxLoop3: videoUrl("/Spx-3-ez.mp4", "/media/video/Spx-3-ez.mp4"),
-  sparkboxLoop4: videoUrl("/Spx-4-ez.mp4", "/media/video/Spx-4-ez.mp4"),
-  sparkboxLoop5: videoUrl("/Spx-5-ez.mp4", "/media/video/Spx-5-ez.mp4"),
-  sparkboxLoop6: videoUrl("/Spx-6-ez.mp4", "/media/video/Spx-6-ez.mp4"),
-  sparkboxLoop7: videoUrl("/Spx-7-ez.mp4", "/media/video/Spx-7-ez.mp4"),
-  sparkboxLoop8: videoUrl("/Spx-8-ez.mp4", "/media/video/Spx-8-ez.mp4"),
+  sparkboxLoop1: videoAsset("Spx-1-ez.mp4"),
+  sparkboxLoop2: videoAsset("Spx-2-ez.mp4"),
+  sparkboxLoop3: videoAsset("Spx-3-ez.mp4"),
+  sparkboxLoop4: videoAsset("Spx-4-ez.mp4"),
+  sparkboxLoop5: videoAsset("Spx-5-ez.mp4"),
+  sparkboxLoop6: videoAsset("Spx-6-ez.mp4"),
+  sparkboxLoop7: videoAsset("Spx-7-ez.mp4"),
+  sparkboxLoop8: videoAsset("Spx-8-ez.mp4"),
   upstairsTrio: videoUrl(
     "/Upstaris@trio.mp4",
     "/media/imports/unknown-album/Unknown Album/Upstaris@trio.mp4",
@@ -17,11 +17,10 @@ const VIDEO_SAMPLES = {
     "/SunSet2021(4x5).mp4",
     "/media/imports/unknown-album/Unknown Album/SunSet2021(4x5).mp4",
   ),
-  trioPromo:
-    videoUrl(
-      "/TRIO5.15.21Promo4x5.mp4",
-      "/media/imports/unknown-album/Unknown Album/TRIO5.15.21Promo4x5.mp4",
-    ),
+  trioPromo: videoUrl(
+    "/TRIO5.15.21Promo4x5.mp4",
+    "/media/imports/unknown-album/Unknown Album/TRIO5.15.21Promo4x5.mp4",
+  ),
 };
 
 export const PASSWORD = "sparkbox";
@@ -32,6 +31,7 @@ export const DESKTOP_LAYOUT = [
   { id: "sparkbox-spin-tactics", x: 1, y: 0 },
   { id: "about-sparkbox", x: 0, y: 1 },
   { id: "bookings", x: 0, y: 2 },
+  { id: "pong-app", x: 1, y: 2, hidden: true },
 ];
 
 export const FILES = {
@@ -42,6 +42,7 @@ export const FILES = {
     "about-sparkbox",
     "bookings",
     "sparkbox-avatar",
+    "pong-app",
   ]),
   "sparkbox-mixes": folder(
     "sparkbox-mixes",
@@ -60,7 +61,7 @@ export const FILES = {
       "headbop",
     ],
     {
-      iconSrc: "/media/logos/sparkbox-logo-black.png",
+      iconSrc: "/folder_PNG100450.png",
     },
   ),
   "sparkbox-spin-tactics": folder(
@@ -68,7 +69,7 @@ export const FILES = {
     "SPARKBOX SPIN TACTICS",
     ["full-hustle", "full-newlvl", "full-rake", "full-throw-some-ds"],
     {
-      iconSrc: "/media/logos/sparkbox-logo-black.png",
+      iconSrc: "/folder_PNG100450.png",
       summary: "Long-form Sparkbox performance clips with live sound.",
     },
   ),
@@ -110,7 +111,7 @@ export const FILES = {
       ],
     },
   ),
-  bookings: textFile("bookings", "bookings.txt", "get booking info from paul", {
+  bookings: textFile("bookings", "bookings.txt", "booking info", {
     summary: "Booking and contact placeholder copy.",
   }),
   "sparkbox-avatar": imageFile(
@@ -140,92 +141,100 @@ export const FILES = {
   "full-hustle": videoFile(
     "full-hustle",
     "hustle.mp4",
-    videoUrl("/full-hustle.mp4", "/media/video/full-hustle.mp4"),
+    videoAsset("full-hustle.mp4"),
     "Long-form Sparkbox visual with full audio.",
   ),
   "full-newlvl": videoFile(
     "full-newlvl",
     "new-lvl.mp4",
-    videoUrl("/full-newlvl.mp4", "/media/video/full-newlvl.mp4"),
+    videoAsset("full-newlvl.mp4"),
     "Long-form Sparkbox visual with full audio.",
   ),
   "full-rake": videoFile(
     "full-rake",
     "rake.mp4",
-    videoUrl("/full-rake.mp4", "/media/video/full-rake.mp4"),
+    videoAsset("full-rake.mp4"),
     "Long-form Sparkbox visual with full audio.",
   ),
   "full-throw-some-ds": videoFile(
     "full-throw-some-ds",
     "throw-some-d's.mp4",
-    videoUrl("/full-throw-some-d's.mp4", "/media/video/full-throw-some-d's.mp4"),
+    videoAsset("full-throw-some-d's.mp4"),
     "Long-form Sparkbox visual with full audio.",
   ),
   "march-on-mars": audioFile(
     "march-on-mars",
     "March on Mars",
-    "/media/tracks/march-on-mars-fixed.mp3",
+    trackAsset("march-on-mars-fixed.mp3"),
     "Cosmic Sparkbox opener.",
   ),
   ignite: audioFile(
     "ignite",
     "IGNITE",
-    "/media/tracks/ignite.mp3",
+    trackAsset("ignite.mp3"),
     "High-energy Sparkbox original.",
   ),
   "shaft-got-money": audioFile(
     "shaft-got-money",
     "Shaft Got Money",
-    "/media/tracks/shaft-got-money.mp3",
+    trackAsset("shaft-got-money.mp3"),
     "Funk-forward flip built to move.",
   ),
   "dont-go-motley-crew": audioFile(
     "dont-go-motley-crew",
     "Don't Go Motley Crew",
-    "/media/tracks/dont-go-motley-crew.mp3",
+    trackAsset("dont-go-motley-crew.mp3"),
     "Rock-dance crossover edit.",
   ),
   "hurricane-space-rave": audioFile(
     "hurricane-space-rave",
     "Hurricane X Space Rave",
-    "/media/tracks/hurricane-x-space-rave.mp3",
+    trackAsset("hurricane-x-space-rave.mp3"),
     "Big-room collision with rave overtones.",
   ),
   "love-late-at-night": audioFile(
     "love-late-at-night",
     "Love Late at Night",
-    "/media/tracks/love-late-at-night.mp3",
+    trackAsset("love-late-at-night.mp3"),
     "Wordplay edit with after-hours warmth.",
   ),
   "dakiti-remix": audioFile(
     "dakiti-remix",
     "Dakiti",
-    "/media/tracks/dakiti-remix.mp3",
+    trackAsset("dakiti-remix.mp3"),
     "Melodic remix with sleek low-end.",
   ),
   "kiss-me-en-mexico": audioFile(
     "kiss-me-en-mexico",
     "Kiss Me En Mexico",
-    "/media/tracks/kiss-me-en-mexico.mp3",
+    trackAsset("kiss-me-en-mexico.mp3"),
     "Sunset-ready edit with romance and bounce.",
   ),
   madsterpiece: audioFile(
     "madsterpiece",
     "MadsterPiece",
-    "/media/tracks/madsterpiece.mp3",
+    trackAsset("madsterpiece.mp3"),
     "Peak-hour Sparkbox edit with big-room momentum.",
   ),
   "its-only-you": audioFile(
     "its-only-you",
     "It's Only You",
-    "/media/tracks/its-only-you.mp3",
+    trackAsset("its-only-you.mp3"),
     "Smooth melodic Sparkbox original.",
   ),
   headbop: audioFile(
     "headbop",
     "HeadBop",
-    "/media/tracks/headbop.wav",
+    trackAsset("headbop.wav"),
     "Percussive club tool with attitude.",
+  ),
+  "pong-app": gameFile(
+    "pong-app",
+    "pong.app",
+    "Tiny desktop pong break for the Sparkbox terminal.",
+    {
+      iconSrc: "/media/images/sparkbox-character.jpg",
+    },
   ),
 };
 
@@ -284,6 +293,16 @@ function audioFile(id, name, src, note) {
     summary: note,
     backgroundVideo: getTrackVideo(id),
     visualTheme: getVisualTheme(id),
+  };
+}
+
+function gameFile(id, name, summary, extra = {}) {
+  return {
+    id,
+    type: "game",
+    name,
+    summary,
+    ...extra,
   };
 }
 

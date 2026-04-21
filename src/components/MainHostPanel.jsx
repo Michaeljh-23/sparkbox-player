@@ -8,6 +8,7 @@ export default function MainHostPanel({
   onMinimize,
   onMove,
   onOpenFile,
+  volume,
 }) {
   const dragStateRef = useRef(null);
 
@@ -84,6 +85,7 @@ export default function MainHostPanel({
         currentTrackId={null}
         isPlaying={false}
         barLevels={[]}
+        volume={volume}
       />
     </section>
   );

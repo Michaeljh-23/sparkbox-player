@@ -12,6 +12,7 @@ export default function WindowFrame({
   currentTrackId,
   isPlaying,
   barLevels,
+  volume,
   onUpdateWindow,
 }) {
   const dragStateRef = useRef(null);
@@ -102,6 +103,7 @@ export default function WindowFrame({
           currentTrackId={currentTrackId}
           isPlaying={isPlaying}
           barLevels={barLevels}
+          volume={volume}
         />
       </div>
     </section>

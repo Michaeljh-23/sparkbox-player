@@ -5,6 +5,7 @@ export function labelFileType(type) {
     image: "visual",
     video: "video",
     audio: "audio",
+    game: "game",
   };
 
   return labels[type] ?? type;

@@ -6,7 +6,6 @@ export default function Taskbar({
   mainView,
   mainViewMinimized,
   openWindows,
-  playbackError,
   playbackPosition,
   trackDuration,
   onSeek,
@@ -26,9 +25,6 @@ export default function Taskbar({
         <div>
           <span className="now-playing-label">Now playing </span>
           <strong>{currentTrack ? currentTrack.name : "Silence"}</strong>
-          {playbackError ? (
-            <div className="taskbar-error">{playbackError}</div>
-          ) : null}
         </div>
         <button
           className="transport-pill"

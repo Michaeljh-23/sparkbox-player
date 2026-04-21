@@ -7,6 +7,7 @@ export const WINDOW_PRESETS = {
   image: { width: 460, height: 430 },
   video: { width: 760, height: 520 },
   audio: { width: 420, height: 300 },
+  game: { width: 640, height: 560 },
 };
 
 export const SATELLITE_DISH = [
@@ -23,7 +24,7 @@ export const MENU_CONFIG = [
     id: "file",
     label: "File",
     items: [
-      { id: "open-root", label: "Open main window" },
+      { id: "toggle-hidden", label: "Show hidden files" },
       { id: "open-selected", label: "Open selected" },
       { id: "fullscreen", label: "Toggle fullscreen" },
       { id: "restart", label: "Logout" },
